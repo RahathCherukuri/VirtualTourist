@@ -69,11 +69,34 @@ class FlickrPhotoViewController: UIViewController {
     }
     
     func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        
-        //        let detailController = storyboard!.instantiateViewControllerWithIdentifier("MemeDetailViewController") as! MemeDetailViewController
-        //        detailController.selectedIndex = indexPath.row
-        //        navigationController!.pushViewController(detailController, animated: true)
+        print("indexPath: ", indexPath.row)
+        let cell = collectionView.cellForItemAtIndexPath(indexPath)! as? FlickrCollectionViewCell
+        cell!.imageView.layer.opacity = 0.5
     }
-
-
+    
+    func collectionView(collectionView: UICollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath) {
+        print("indexPath: ", indexPath.row)
+        let cell = collectionView.cellForItemAtIndexPath(indexPath)! as? FlickrCollectionViewCell
+        cell!.imageView.layer.opacity = 1
+    }
 }
+
+//        let detailController = storyboard!.instantiateViewControllerWithIdentifier("MemeDetailViewController") as! MemeDetailViewController
+//        detailController.selectedIndex = indexPath.row
+//        navigationController!.pushViewController(detailController, animated: true)
+
+extension FlickrPhotoViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {
+        let screenWidth = UIScreen.mainScreen().bounds.size
+        let cellSize = screenWidth.width/3.25
+        return CGSize(width: cellSize,height: cellSize)
+    }
+}
+
+
+
+
+
+
+
+
