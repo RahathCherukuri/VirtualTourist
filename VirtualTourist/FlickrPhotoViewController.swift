@@ -12,6 +12,10 @@ class FlickrPhotoViewController: UIViewController {
     
     @IBOutlet weak var flickrCollectionView: UICollectionView!
     
+    @IBOutlet weak var bottomBarButton: UIButton!
+    
+    var selectedIndexes = Set<NSIndexPath>();
+    
     var methodArguments = [
         "method": METHOD_NAME,
         "api_key": API_KEY,
@@ -23,8 +27,8 @@ class FlickrPhotoViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        flickrCollectionView.allowsMultipleSelection = true
         setCollectionView()
-        // Do any additional setup after loading the view.
     }
     
     func setCollectionView() {
@@ -35,7 +39,7 @@ class FlickrPhotoViewController: UIViewController {
         
         FlickrClient.sharedInstance().getImageFromFlickrBySearch(methodArguments) {(success, photos, errorString) in
             if success {
-                FlickrClient.sharedInstance().savePhotoData(photos!, index: 0)
+                FlickrClient.sharedInstance().savePhotoData(photos!)
                 dispatch_async(dispatch_get_main_queue(), {
                     self.flickrCollectionView.reloadData()
                 })
@@ -45,45 +49,67 @@ class FlickrPhotoViewController: UIViewController {
         }
     }
     
-    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-            return Data.DataCollectionViewOne.count
-    }
-    
-    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
-            let cell = collectionView.dequeueReusableCellWithReuseIdentifier("FlickrCollectionViewCell", forIndexPath: indexPath) as! FlickrCollectionViewCell
+    // TODO: Add Code to delete elements from the array(Photos.photoArray) and the flickrCollectionView
+    @IBAction func bottomButtonPressed(sender: UIButton) {
+        if selectedIndexes.count > 0 {
+//            for indexPath in selectedIndexes {
+//                print("row: ", indexPath.row)
+//                
+//            }
             
-            if Data.DataCollectionViewOne.count > 0 {
-                let photo = Data.DataCollectionViewOne[indexPath.row]
-                
-                let imageUrlString = photo.url
-                let imageURL = NSURL(string: imageUrlString)
-                if let imageData = NSData(contentsOfURL: imageURL!) {
-                    dispatch_async(dispatch_get_main_queue(), {
-                        cell.imageView.image = UIImage(data: imageData)
-                    })
-                }
-                return cell
-            } else {
-                return cell
-            }
-    }
-    
-    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
-        print("indexPath: ", indexPath.row)
-        let cell = collectionView.cellForItemAtIndexPath(indexPath)! as? FlickrCollectionViewCell
-        cell!.imageView.layer.opacity = 0.5
-    }
-    
-    func collectionView(collectionView: UICollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath) {
-        print("indexPath: ", indexPath.row)
-        let cell = collectionView.cellForItemAtIndexPath(indexPath)! as? FlickrCollectionViewCell
-        cell!.imageView.layer.opacity = 1
+        }
     }
 }
 
-//        let detailController = storyboard!.instantiateViewControllerWithIdentifier("MemeDetailViewController") as! MemeDetailViewController
-//        detailController.selectedIndex = indexPath.row
-//        navigationController!.pushViewController(detailController, animated: true)
+extension FlickrPhotoViewController: UICollectionViewDataSource {
+    func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
+        return Photos.photoArray.count
+    }
+    
+    func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
+        let cell = collectionView.dequeueReusableCellWithReuseIdentifier("FlickrCollectionViewCell", forIndexPath: indexPath) as! FlickrCollectionViewCell
+        
+        if Photos.photoArray.count > 0 {
+            let photo = Photos.photoArray[indexPath.row]
+            
+            let imageUrlString = photo.url
+            let imageURL = NSURL(string: imageUrlString)
+            if let imageData = NSData(contentsOfURL: imageURL!) {
+                dispatch_async(dispatch_get_main_queue(), {
+                    cell.imageView.image = UIImage(data: imageData)
+                })
+            }
+            return cell
+        } else {
+            return cell
+        }
+    }
+
+}
+
+extension FlickrPhotoViewController: UICollectionViewDelegate {
+    func collectionView(collectionView: UICollectionView, didSelectItemAtIndexPath indexPath: NSIndexPath) {
+//        print("didSelectItemAtIndexPath indexPath: ", indexPath.row)
+        selectedIndexes.insert(indexPath)
+        let cell = collectionView.cellForItemAtIndexPath(indexPath)! as? FlickrCollectionViewCell
+        cell!.imageView.layer.opacity = 0.5
+        setbottomBarButtonText()
+    }
+    
+    func collectionView(collectionView: UICollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath) {
+//        print("didDeselectItemAtIndexPath indexPath: ", indexPath.row)
+        let cell = collectionView.cellForItemAtIndexPath(indexPath)! as? FlickrCollectionViewCell
+        cell!.imageView.layer.opacity = 1
+        selectedIndexes.remove(indexPath)
+        setbottomBarButtonText()
+    }
+    
+    func setbottomBarButtonText() {
+        print("selectedIndexes.count: ", selectedIndexes.count)
+        let text = (selectedIndexes.count == 0) ? "New Collection" : "Remove Selected Items"
+        bottomBarButton.setTitle(text,forState: .Normal)
+    }
+}
 
 extension FlickrPhotoViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAtIndexPath indexPath: NSIndexPath) -> CGSize {

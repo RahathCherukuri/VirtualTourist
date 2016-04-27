@@ -32,7 +32,7 @@ extension FlickrClient {
         }
     }
     
-    func savePhotoData(photos: [String: AnyObject], index: Int) {
+    func savePhotoData(photos: [String: AnyObject]) {
         let totalPhotosCount = (photos[FlickrClient.JSONResponseKeys.Totalphotos] as? NSString)?.integerValue
         
         if (totalPhotosCount > 0) {
@@ -43,10 +43,6 @@ extension FlickrClient {
                 return
             }
             
-            if index == 0 {
-                Data.DataCollectionViewOne.removeAll()
-            }
-            
             for photoDictionary in photosArray {
                 /* GUARD: Does our photo have a key for 'url_m'? */
                 guard let imageUrlString = photoDictionary[FlickrClient.JSONResponseKeys.Url] as? String,
@@ -55,13 +51,8 @@ extension FlickrClient {
                         print("Cannot find key 'url_m' in \(photoDictionary)")
                         return
                 }
-                photo(title: photoTitle,url: imageUrlString)
+                Photos(title: photoTitle,url: imageUrlString)
             }
-            if index == 0 {
-                Data.DataCollectionViewOne = photo.photoArray
-            }
-            
-            photo.photoArray.removeAll()
         }
     }
     

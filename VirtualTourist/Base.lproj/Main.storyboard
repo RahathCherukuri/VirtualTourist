@@ -63,6 +63,9 @@
                                     <constraint firstAttribute="height" constant="40" id="hFQ-Qz-DgW"/>
                                 </constraints>
                                 <state key="normal" title="New Collection"/>
+                                <connections>
+                                    <action selector="bottomButtonPressed:" destination="ADw-wn-B3N" eventType="touchUpInside" id="5Q7-N3-YY2"/>
+                                </connections>
                             </button>
                         </subviews>
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -77,6 +80,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="bottomBarButton" destination="xP2-6l-67c" id="sZI-ue-JE5"/>
                         <outlet property="flickrCollectionView" destination="nXq-73-rds" id="yVT-tt-fi4"/>
                     </connections>
                 </viewController>

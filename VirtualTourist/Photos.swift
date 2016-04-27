@@ -8,10 +8,9 @@
 
 import Foundation
 
-
-struct photo {
+struct Photos {
     
-    static var photoArray: [photo] = []
+    static var photoArray: [Photos] = []
     
     let title: String
     let url: String
@@ -19,10 +18,6 @@ struct photo {
     init(title: String, url: String) {
         self.title = title
         self.url = url
-        photo.photoArray.append(self)
+        Photos.photoArray.append(self)
     }
-}
-
-class Data {
-    static var DataCollectionViewOne: [photo] = []
 }
