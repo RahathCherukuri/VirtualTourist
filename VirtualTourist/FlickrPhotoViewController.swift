@@ -14,6 +14,7 @@ class FlickrPhotoViewController: UIViewController {
     
     @IBOutlet weak var bottomBarButton: UIButton!
     
+//    var selectedIndexes = Set<NSIndexPath>();
     var selectedIndexes = Set<NSIndexPath>();
     
     var methodArguments = [
@@ -51,12 +52,15 @@ class FlickrPhotoViewController: UIViewController {
     
     // TODO: Add Code to delete elements from the array(Photos.photoArray) and the flickrCollectionView
     @IBAction func bottomButtonPressed(sender: UIButton) {
+        var array = [NSIndexPath]()
         if selectedIndexes.count > 0 {
-//            for indexPath in selectedIndexes {
-//                print("row: ", indexPath.row)
-//                
-//            }
-            
+            for index in selectedIndexes {
+                Photos.photoArray.removeAtIndex(index.row)
+                array.append(index)
+            }
+//            flickrCollectionView.deleteItemsAtIndexPaths(array)
+            flickrCollectionView.reloadData()
+            selectedIndexes.removeAll()
         }
     }
 }
@@ -79,6 +83,12 @@ extension FlickrPhotoViewController: UICollectionViewDataSource {
                     cell.imageView.image = UIImage(data: imageData)
                 })
             }
+            
+            if (cell.selected) {
+                cell.imageView.layer.opacity = 0
+            } else {
+                cell.imageView.layer.opacity = 1
+            }
             return cell
         } else {
             return cell
@@ -92,7 +102,7 @@ extension FlickrPhotoViewController: UICollectionViewDelegate {
 //        print("didSelectItemAtIndexPath indexPath: ", indexPath.row)
         selectedIndexes.insert(indexPath)
         let cell = collectionView.cellForItemAtIndexPath(indexPath)! as? FlickrCollectionViewCell
-        cell!.imageView.layer.opacity = 0.5
+        cell!.imageView.layer.opacity = 0
         setbottomBarButtonText()
     }
     
