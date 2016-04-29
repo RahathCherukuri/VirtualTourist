@@ -9,18 +9,35 @@
 import UIKit
 import MapKit
 
-class ViewController: UIViewController,MKMapViewDelegate {
+class ViewController: UIViewController {
 
     @IBOutlet weak var mapView: MKMapView!
+    
+    @IBOutlet weak var deleteItemsButton: UIButton!
+    
+    @IBOutlet weak var editItemsButton: UIBarButtonItem!
+    
+    var annotations: Array = [MKPointAnnotation]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         addLongPressGestureRecognizer()
         mapView.delegate = self
+        deleteItemsButton.hidden = true
     }
 
     @IBAction func editButtonPressed(sender: UIBarButtonItem) {
+        if (editItemsButton.title == "Edit") {
+            deleteItemsButton.hidden = false
+        } else if (editItemsButton.title == "Done") {
+            deleteItemsButton.hidden = false
+        }
+        let title = (editItemsButton.title == "Edit") ? "Edit" : "Done"
+        editItemsButton.title = title
+    }
+    
+    @IBAction func deleteAnnotations(sender: UIButton) {
         
     }
     
@@ -30,21 +47,24 @@ class ViewController: UIViewController,MKMapViewDelegate {
         mapView.addGestureRecognizer(longPressRecogniser)
     }
     
-    func handleLongPress(getstureRecognizer : UIGestureRecognizer){
-        if getstureRecognizer.state != .Began { return }
+    func handleLongPress(gestureRecognizer : UIGestureRecognizer){
+        if gestureRecognizer.state != .Began { return }
         
-        let touchPoint = getstureRecognizer.locationInView(self.mapView)
+        let touchPoint = gestureRecognizer.locationInView(self.mapView)
         let touchMapCoordinate = mapView.convertPoint(touchPoint, toCoordinateFromView: mapView)
         
         let annotation = MKPointAnnotation()
         annotation.coordinate = touchMapCoordinate
-        annotation.title = "\(annotation.coordinate.latitude)"
-        annotation.subtitle = "\(annotation.coordinate.longitude)"
         print("latitude: ", touchMapCoordinate.latitude)
         print("longitude: ", touchMapCoordinate.longitude)
+        annotations.append(annotation)
         mapView.addAnnotation(annotation)
     }
+}
+
+extension ViewController: MKMapViewDelegate {
     
+    // Returns the view associated with the specified annotation object.
     func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
         print("viewForAnnotation")
         let reuseId = "pin"
@@ -53,8 +73,6 @@ class ViewController: UIViewController,MKMapViewDelegate {
         
         if pinView == nil {
             pinView = MKPinAnnotationView(annotation: annotation, reuseIdentifier: reuseId)
-            pinView!.canShowCallout = true
-            pinView!.rightCalloutAccessoryView = UIButton(type: .DetailDisclosure)
         }
         else {
             pinView!.annotation = annotation
@@ -74,5 +92,15 @@ class ViewController: UIViewController,MKMapViewDelegate {
             print("longitude: ", longitude)
         }
     }
+    
+    func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
+        print("Selected")
+    }
+    
+    func mapView(mapView: MKMapView, didDeselectAnnotationView view: MKAnnotationView) {
+        print("De-selected")
+    }
 }
+
+
 
