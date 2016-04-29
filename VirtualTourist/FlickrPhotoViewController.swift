@@ -14,7 +14,6 @@ class FlickrPhotoViewController: UIViewController {
     
     @IBOutlet weak var bottomBarButton: UIButton!
     
-//    var selectedIndexes = Set<NSIndexPath>();
     var selectedIndexes = Set<NSIndexPath>();
     
     var methodArguments = [
@@ -50,7 +49,6 @@ class FlickrPhotoViewController: UIViewController {
         }
     }
     
-    // TODO: Add Code to delete elements from the array(Photos.photoArray) and the flickrCollectionView
     @IBAction func bottomButtonPressed(sender: UIButton) {
         var array = [NSIndexPath]()
         if selectedIndexes.count > 0 {
@@ -58,8 +56,7 @@ class FlickrPhotoViewController: UIViewController {
                 Photos.photoArray.removeAtIndex(index.row)
                 array.append(index)
             }
-//            flickrCollectionView.deleteItemsAtIndexPaths(array)
-            flickrCollectionView.reloadData()
+            flickrCollectionView.deleteItemsAtIndexPaths(array)
             selectedIndexes.removeAll()
         }
     }
@@ -83,12 +80,7 @@ extension FlickrPhotoViewController: UICollectionViewDataSource {
                     cell.imageView.image = UIImage(data: imageData)
                 })
             }
-            
-            if (cell.selected) {
-                cell.imageView.layer.opacity = 0
-            } else {
-                cell.imageView.layer.opacity = 1
-            }
+            setCellOpacity(cell)
             return cell
         } else {
             return cell
@@ -102,16 +94,20 @@ extension FlickrPhotoViewController: UICollectionViewDelegate {
 //        print("didSelectItemAtIndexPath indexPath: ", indexPath.row)
         selectedIndexes.insert(indexPath)
         let cell = collectionView.cellForItemAtIndexPath(indexPath)! as? FlickrCollectionViewCell
-        cell!.imageView.layer.opacity = 0
+        setCellOpacity(cell!)
         setbottomBarButtonText()
     }
     
     func collectionView(collectionView: UICollectionView, didDeselectItemAtIndexPath indexPath: NSIndexPath) {
 //        print("didDeselectItemAtIndexPath indexPath: ", indexPath.row)
         let cell = collectionView.cellForItemAtIndexPath(indexPath)! as? FlickrCollectionViewCell
-        cell!.imageView.layer.opacity = 1
+        setCellOpacity(cell!)
         selectedIndexes.remove(indexPath)
         setbottomBarButtonText()
+    }
+    
+    func setCellOpacity(cell: FlickrCollectionViewCell) {
+        cell.imageView.layer.opacity = (cell.selected) ? 0 : 1
     }
     
     func setbottomBarButtonText() {
