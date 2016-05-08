@@ -15,30 +15,41 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var deleteItemsButton: UIButton!
     
-    @IBOutlet weak var editItemsButton: UIBarButtonItem!
-    
     var annotations: Array = [MKPointAnnotation]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         addLongPressGestureRecognizer()
+        addBarButtonItem()
         mapView.delegate = self
         deleteItemsButton.hidden = true
     }
+    
+    func addBarButtonItem() {
+        let editButton = UIBarButtonItem.init(title: "Edit", style: .Plain, target:self, action: #selector(ViewController.editButtonPressed(_:)))
+        navigationController?.navigationBar.topItem?.rightBarButtonItem = editButton
+    }
 
-    @IBAction func editButtonPressed(sender: UIBarButtonItem) {
-        if (editItemsButton.title == "Edit") {
-            deleteItemsButton.hidden = false
-        } else if (editItemsButton.title == "Done") {
-            deleteItemsButton.hidden = false
-        }
-        let title = (editItemsButton.title == "Edit") ? "Edit" : "Done"
-        editItemsButton.title = title
+    func editButtonPressed(sender: UIBarButtonItem?) {
+        setRightBarButtonAndBottomButton()
+        annotations.map({
+            print($0.coordinate)
+        })
     }
     
     @IBAction func deleteAnnotations(sender: UIButton) {
-        
+        setRightBarButtonAndBottomButton()
+    }
+    
+    func setRightBarButtonAndBottomButton() {
+        let title = getRightBarButtonItemTitle()
+        deleteItemsButton.hidden = (title == "Edit") ? false : true
+        navigationController?.navigationBar.topItem?.rightBarButtonItem?.title = (title == "Edit") ? "Done" : "Edit"
+    }
+    
+    func getRightBarButtonItemTitle() -> String? {
+        return navigationController?.navigationBar.topItem?.rightBarButtonItem?.title
     }
     
     func addLongPressGestureRecognizer() {
@@ -55,8 +66,6 @@ class ViewController: UIViewController {
         
         let annotation = MKPointAnnotation()
         annotation.coordinate = touchMapCoordinate
-        print("latitude: ", touchMapCoordinate.latitude)
-        print("longitude: ", touchMapCoordinate.longitude)
         annotations.append(annotation)
         mapView.addAnnotation(annotation)
     }
@@ -66,7 +75,6 @@ extension ViewController: MKMapViewDelegate {
     
     // Returns the view associated with the specified annotation object.
     func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
-        print("viewForAnnotation")
         let reuseId = "pin"
         
         var pinView = mapView.dequeueReusableAnnotationViewWithIdentifier(reuseId) as? MKPinAnnotationView
@@ -76,30 +84,42 @@ extension ViewController: MKMapViewDelegate {
         }
         else {
             pinView!.annotation = annotation
+            pinView?.pinTintColor = UIColor.blueColor()
         }
         
         return pinView
     }
     
-    // This delegate method is implemented to respond to taps.
-    func mapView(mapView: MKMapView, annotationView: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
-        print("clicked")
-        if control == annotationView.rightCalloutAccessoryView {
-            print("mapView delegate method")
-            let latitude = annotationView.annotation?.coordinate.latitude
-            let longitude = annotationView.annotation?.coordinate.longitude
-            print("latitude: ", latitude)
-            print("longitude: ", longitude)
-        }
-    }
+//     // This delegate method is implemented to respond to taps.
+//    func mapView(mapView: MKMapView, annotationView: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
+//        if control == annotationView.rightCalloutAccessoryView {
+//            
+//            let coordinate = annotationView.annotation?.coordinate
+//            let latitude = coordinate?.latitude
+//            let longitude = coordinate?.longitude
+//        
+//            print("latitude: ", latitude)
+//            print("longitude: ", longitude)
+//        }
+//    }
+    
+    // TODO: Remove items from array once selected.
     
     func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
         print("Selected")
+        let title = getRightBarButtonItemTitle()
+
+        if (title == "Done") {
+            mapView.removeAnnotation((view.annotation)!)
+            return
+        }
+        
+        // If title is Edit
+        let controller = storyboard?.instantiateViewControllerWithIdentifier("FlickrPhotoViewController") as! FlickrPhotoViewController
+        controller.coordinate = view.annotation?.coordinate
+        navigationController?.pushViewController(controller, animated: true)
     }
-    
-    func mapView(mapView: MKMapView, didDeselectAnnotationView view: MKAnnotationView) {
-        print("De-selected")
-    }
+
 }
 
 

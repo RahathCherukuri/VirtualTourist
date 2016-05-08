@@ -8,7 +8,7 @@
         <!--Flickr Photo View Controller-->
         <scene sceneID="0sG-44-LCB">
             <objects>
-                <viewController id="ADw-wn-B3N" customClass="FlickrPhotoViewController" customModule="VirtualTourist" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="FlickrPhotoViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="ADw-wn-B3N" customClass="FlickrPhotoViewController" customModule="VirtualTourist" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="3wX-wi-uZY"/>
                         <viewControllerLayoutGuide type="bottom" id="fwY-16-eNI"/>
@@ -126,16 +126,9 @@
                             <constraint firstItem="ba6-ph-XhI" firstAttribute="top" secondItem="lEJ-HS-ekD" secondAttribute="bottom" id="t8q-SW-Fmz"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="Virtual Tourist" id="Ozb-2Z-p1I">
-                        <barButtonItem key="rightBarButtonItem" title="Item" systemItem="edit" id="ykR-53-08g">
-                            <connections>
-                                <action selector="editButtonPressed:" destination="BYZ-38-t0r" id="3sb-D2-YyS"/>
-                            </connections>
-                        </barButtonItem>
-                    </navigationItem>
+                    <navigationItem key="navigationItem" title="Virtual Tourist" id="Ozb-2Z-p1I"/>
                     <connections>
                         <outlet property="deleteItemsButton" destination="ba6-ph-XhI" id="5Ig-mj-z5D"/>
-                        <outlet property="editItemsButton" destination="ykR-53-08g" id="cAm-jf-8om"/>
                         <outlet property="mapView" destination="lEJ-HS-ekD" id="76J-qc-ZF8"/>
                     </connections>
                 </viewController>

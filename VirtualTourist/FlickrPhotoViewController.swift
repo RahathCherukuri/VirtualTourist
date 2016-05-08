@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MapKit
 
 class FlickrPhotoViewController: UIViewController {
     
@@ -16,7 +17,9 @@ class FlickrPhotoViewController: UIViewController {
     
     var selectedIndexes = Set<NSIndexPath>();
     
-    var methodArguments = [
+    var coordinate: CLLocationCoordinate2D?
+    
+    var methodArguments: [String: AnyObject] = [
         "method": METHOD_NAME,
         "api_key": API_KEY,
         "safe_search": SAFE_SEARCH,
@@ -33,9 +36,8 @@ class FlickrPhotoViewController: UIViewController {
     
     func setCollectionView() {
         
-        let searchText = "NewYork, NY"
-        print("Random Text: ", searchText)
-        methodArguments["text"] = searchText
+        methodArguments["lat"] = coordinate?.latitude
+        methodArguments["lon"] = coordinate?.longitude
         
         FlickrClient.sharedInstance().getImageFromFlickrBySearch(methodArguments) {(success, photos, errorString) in
             if success {
@@ -107,7 +109,7 @@ extension FlickrPhotoViewController: UICollectionViewDelegate {
     }
     
     func setCellOpacity(cell: FlickrCollectionViewCell) {
-        cell.imageView.layer.opacity = (cell.selected) ? 0 : 1
+        cell.imageView.layer.opacity = (cell.selected) ? 0.5 : 1
     }
     
     func setbottomBarButtonText() {
