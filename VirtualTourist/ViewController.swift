@@ -33,9 +33,6 @@ class ViewController: UIViewController {
 
     func editButtonPressed(sender: UIBarButtonItem?) {
         setRightBarButtonAndBottomButton()
-        annotations.map({
-            print($0.coordinate)
-        })
     }
     
     @IBAction func deleteAnnotations(sender: UIButton) {
@@ -90,26 +87,12 @@ extension ViewController: MKMapViewDelegate {
         return pinView
     }
     
-//     // This delegate method is implemented to respond to taps.
-//    func mapView(mapView: MKMapView, annotationView: MKAnnotationView, calloutAccessoryControlTapped control: UIControl) {
-//        if control == annotationView.rightCalloutAccessoryView {
-//            
-//            let coordinate = annotationView.annotation?.coordinate
-//            let latitude = coordinate?.latitude
-//            let longitude = coordinate?.longitude
-//        
-//            print("latitude: ", latitude)
-//            print("longitude: ", longitude)
-//        }
-//    }
-    
-    // TODO: Remove items from array once selected.
-    
     func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
-        print("Selected")
         let title = getRightBarButtonItemTitle()
-
         if (title == "Done") {
+            annotations = annotations.filter({
+                return compareAnnotations($0.coordinate, selectedAnnotation: (view.annotation?.coordinate)!)
+            })
             mapView.removeAnnotation((view.annotation)!)
             return
         }
@@ -118,6 +101,10 @@ extension ViewController: MKMapViewDelegate {
         let controller = storyboard?.instantiateViewControllerWithIdentifier("FlickrPhotoViewController") as! FlickrPhotoViewController
         controller.coordinate = view.annotation?.coordinate
         navigationController?.pushViewController(controller, animated: true)
+    }
+    
+    func compareAnnotations(annotation: CLLocationCoordinate2D, selectedAnnotation: CLLocationCoordinate2D) -> Bool {
+        return !((annotation.latitude == selectedAnnotation.latitude) && (annotation.longitude == selectedAnnotation.longitude))
     }
 
 }
