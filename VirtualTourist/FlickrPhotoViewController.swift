@@ -19,6 +19,8 @@ class FlickrPhotoViewController: UIViewController {
     
     var coordinate: CLLocationCoordinate2D?
     
+    var photoArray: [Photos] = []
+    
     var methodArguments: [String: AnyObject] = [
         "method": METHOD_NAME,
         "api_key": API_KEY,
@@ -41,7 +43,7 @@ class FlickrPhotoViewController: UIViewController {
         
         FlickrClient.sharedInstance().getImageFromFlickrBySearch(methodArguments) {(success, photos, errorString) in
             if success {
-                FlickrClient.sharedInstance().savePhotoData(photos!)
+                self.savePhotoData(photos!)
                 dispatch_async(dispatch_get_main_queue(), {
                     self.flickrCollectionView.reloadData()
                 })
@@ -55,25 +57,51 @@ class FlickrPhotoViewController: UIViewController {
         var array = [NSIndexPath]()
         if selectedIndexes.count > 0 {
             for index in selectedIndexes {
-                Photos.photoArray.removeAtIndex(index.row)
+                photoArray.removeAtIndex(index.row)
                 array.append(index)
             }
             flickrCollectionView.deleteItemsAtIndexPaths(array)
             selectedIndexes.removeAll()
         }
     }
+    
+    func savePhotoData(photos: [String: AnyObject]) {
+        
+        let totalPhotosCount = (photos[FlickrClient.JSONResponseKeys.Totalphotos] as? NSString)?.integerValue
+        
+        if (totalPhotosCount > 0) {
+            
+            /* GUARD: Is the "photo" key in photosDictionary? */
+            guard let photosArray = photos[FlickrClient.JSONResponseKeys.Photo] as? [[String: AnyObject]] where photosArray.count > 0 else {
+                print("Cannot find key 'photo' in \(photos)")
+                return
+            }
+            
+            for photoDictionary in photosArray {
+                /* GUARD: Does our photo have a key for 'url_m'? */
+                guard let imageUrlString = photoDictionary[FlickrClient.JSONResponseKeys.Url] as? String,
+                    let photoTitle = photoDictionary[FlickrClient.JSONResponseKeys.Title] as? String
+                    else {
+                        print("Cannot find key 'url_m' in \(photoDictionary)")
+                        return
+                }
+                let photo = Photos(title: photoTitle,url: imageUrlString)
+                photoArray.append(photo)
+            }
+        }
+    }
 }
 
 extension FlickrPhotoViewController: UICollectionViewDataSource {
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return Photos.photoArray.count
+        return photoArray.count
     }
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("FlickrCollectionViewCell", forIndexPath: indexPath) as! FlickrCollectionViewCell
         
-        if Photos.photoArray.count > 0 {
-            let photo = Photos.photoArray[indexPath.row]
+        if photoArray.count > 0 {
+            let photo = photoArray[indexPath.row]
             
             let imageUrlString = photo.url
             let imageURL = NSURL(string: imageUrlString)

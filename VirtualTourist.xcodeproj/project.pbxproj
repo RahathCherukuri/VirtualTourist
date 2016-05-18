@@ -20,6 +20,7 @@
 		326733D51CCEFCD400541D83 /* Photos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 326733D41CCEFCD400541D83 /* Photos.swift */; };
 		326733D71CCEFD3000541D83 /* FlickrConvenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 326733D61CCEFD3000541D83 /* FlickrConvenience.swift */; };
 		326733D91CCEFE7200541D83 /* FlickrCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 326733D81CCEFE7200541D83 /* FlickrCollectionViewCell.swift */; };
+		32FC57821CECB6AA00007865 /* Pin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32FC57811CECB6AA00007865 /* Pin.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -59,6 +60,7 @@
 		326733D41CCEFCD400541D83 /* Photos.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Photos.swift; sourceTree = "<group>"; };
 		326733D61CCEFD3000541D83 /* FlickrConvenience.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlickrConvenience.swift; sourceTree = "<group>"; };
 		326733D81CCEFE7200541D83 /* FlickrCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlickrCollectionViewCell.swift; sourceTree = "<group>"; };
+		32FC57811CECB6AA00007865 /* Pin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pin.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -116,6 +118,7 @@
 				326733D81CCEFE7200541D83 /* FlickrCollectionViewCell.swift */,
 				326733A41CCEE98000541D83 /* Main.storyboard */,
 				326733D41CCEFCD400541D83 /* Photos.swift */,
+				32FC57811CECB6AA00007865 /* Pin.swift */,
 				326733A71CCEE98000541D83 /* Assets.xcassets */,
 				326733A91CCEE98000541D83 /* LaunchScreen.storyboard */,
 				326733AC1CCEE98000541D83 /* Info.plist */,
@@ -286,6 +289,7 @@
 				326733D71CCEFD3000541D83 /* FlickrConvenience.swift in Sources */,
 				326733D51CCEFCD400541D83 /* Photos.swift in Sources */,
 				326733A31CCEE98000541D83 /* ViewController.swift in Sources */,
+				32FC57821CECB6AA00007865 /* Pin.swift in Sources */,
 				326733D91CCEFE7200541D83 /* FlickrCollectionViewCell.swift in Sources */,
 				326733D31CCEFBC900541D83 /* FlickrConstants.swift in Sources */,
 				326733CF1CCEF9B800541D83 /* FlickrPhotoViewController.swift in Sources */,

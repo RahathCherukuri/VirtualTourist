@@ -62,7 +62,9 @@ class ViewController: UIViewController {
         let touchMapCoordinate = mapView.convertPoint(touchPoint, toCoordinateFromView: mapView)
         
         let annotation = MKPointAnnotation()
-        annotation.coordinate = touchMapCoordinate
+        let pin = Pin(coordinate: touchMapCoordinate)
+        print("coordiante: ", pin.coordinate)
+        annotation.coordinate = pin.coordinate
         annotations.append(annotation)
         mapView.addAnnotation(annotation)
     }
