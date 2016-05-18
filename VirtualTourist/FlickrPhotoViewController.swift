@@ -15,6 +15,8 @@ class FlickrPhotoViewController: UIViewController {
     
     @IBOutlet weak var bottomBarButton: UIButton!
     
+    var pages: Int?
+    
     var selectedIndexes = Set<NSIndexPath>();
     
     var coordinate: CLLocationCoordinate2D?
@@ -27,7 +29,8 @@ class FlickrPhotoViewController: UIViewController {
         "safe_search": SAFE_SEARCH,
         "extras": EXTRAS,
         "format": DATA_FORMAT,
-        "nojsoncallback": NO_JSON_CALLBACK
+        "nojsoncallback": NO_JSON_CALLBACK,
+        "per_page": PER_PAGE
     ]
 
     override func viewDidLoad() {
@@ -40,9 +43,30 @@ class FlickrPhotoViewController: UIViewController {
         
         methodArguments["lat"] = coordinate?.latitude
         methodArguments["lon"] = coordinate?.longitude
-        
+        methodArguments["page"] = 0
+        getImagesFromFlickr()
+    }
+    
+    @IBAction func bottomButtonPressed(sender: UIButton) {
+        var array = [NSIndexPath]()
+        if selectedIndexes.count > 0 {
+            print("Delete items")
+            _ = selectedIndexes.map({
+                photoArray.removeAtIndex($0.row)
+                array.append($0)
+            })
+            flickrCollectionView.deleteItemsAtIndexPaths(array)
+            selectedIndexes.removeAll()
+        } else {
+            methodArguments["page"] = randomValue(pages!)
+            getImagesFromFlickr()
+        }
+    }
+    
+    func getImagesFromFlickr() {
         FlickrClient.sharedInstance().getImageFromFlickrBySearch(methodArguments) {(success, photos, errorString) in
             if success {
+                self.photoArray.removeAll()
                 self.savePhotoData(photos!)
                 dispatch_async(dispatch_get_main_queue(), {
                     self.flickrCollectionView.reloadData()
@@ -53,16 +77,12 @@ class FlickrPhotoViewController: UIViewController {
         }
     }
     
-    @IBAction func bottomButtonPressed(sender: UIButton) {
-        var array = [NSIndexPath]()
-        if selectedIndexes.count > 0 {
-            for index in selectedIndexes {
-                photoArray.removeAtIndex(index.row)
-                array.append(index)
-            }
-            flickrCollectionView.deleteItemsAtIndexPaths(array)
-            selectedIndexes.removeAll()
-        }
+    /* Flickr API will only return up the 4000 images (50 per page * 80 page max) */
+    /* Pick a random page! */
+    
+    func randomValue(noOfPages: Int) -> Int {
+        let pageLimit = min(noOfPages, 80)
+        return Int(arc4random_uniform(UInt32(pageLimit))) + 1
     }
     
     func savePhotoData(photos: [String: AnyObject]) {
@@ -72,10 +92,14 @@ class FlickrPhotoViewController: UIViewController {
         if (totalPhotosCount > 0) {
             
             /* GUARD: Is the "photo" key in photosDictionary? */
-            guard let photosArray = photos[FlickrClient.JSONResponseKeys.Photo] as? [[String: AnyObject]] where photosArray.count > 0 else {
+            guard let photosArray = photos[FlickrClient.JSONResponseKeys.Photo] as? [[String: AnyObject]] where photosArray.count > 0,
+                 let totalPages = photos[FlickrClient.JSONResponseKeys.Pages] as? Int
+            else {
                 print("Cannot find key 'photo' in \(photos)")
                 return
             }
+            
+            pages = totalPages
             
             for photoDictionary in photosArray {
                 /* GUARD: Does our photo have a key for 'url_m'? */

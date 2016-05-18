@@ -15,6 +15,7 @@ let EXTRAS = "url_m"
 let SAFE_SEARCH = "1"
 let DATA_FORMAT = "json"
 let NO_JSON_CALLBACK = "1"
+let PER_PAGE = "15"
 
 extension FlickrClient {
     
@@ -25,6 +26,6 @@ extension FlickrClient {
         static let Totalphotos = "total"
         static let Title = "title"
         static let Url = "url_m"
-        
+        static let Pages = "pages"
     }
 }
