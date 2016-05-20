@@ -11,9 +11,12 @@ import MapKit
 
 class Pin {
     
-    let coordinate: CLLocationCoordinate2D
+    var latitude: Double
+    var longitude: Double
+    var photos: [Photos] = [Photos]()
     
     init(coordinate: CLLocationCoordinate2D) {
-        self.coordinate = coordinate
+        latitude = coordinate.latitude
+        longitude = coordinate.longitude
     }
 }

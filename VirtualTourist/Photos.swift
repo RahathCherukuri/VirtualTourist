@@ -10,14 +10,11 @@ import Foundation
 
 class Photos {
     
-//    static var photoArray: [Photos] = []
+    var title: String
+    var url: String
     
-    let title: String
-    let url: String
-    
-    init(title: String, url: String) {
-        self.title = title
-        self.url = url
-//        Photos.photoArray.append(self)
+    init(dictionary: [String : AnyObject]) {
+        title = dictionary[FlickrClient.JSONResponseKeys.Title] as! String
+        url = dictionary[FlickrClient.JSONResponseKeys.Url] as! String
     }
 }

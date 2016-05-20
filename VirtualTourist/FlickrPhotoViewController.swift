@@ -101,17 +101,9 @@ class FlickrPhotoViewController: UIViewController {
             
             pages = totalPages
             
-            for photoDictionary in photosArray {
-                /* GUARD: Does our photo have a key for 'url_m'? */
-                guard let imageUrlString = photoDictionary[FlickrClient.JSONResponseKeys.Url] as? String,
-                    let photoTitle = photoDictionary[FlickrClient.JSONResponseKeys.Title] as? String
-                    else {
-                        print("Cannot find key 'url_m' in \(photoDictionary)")
-                        return
-                }
-                let photo = Photos(title: photoTitle,url: imageUrlString)
-                photoArray.append(photo)
-            }
+            _ = photosArray.map({
+                photoArray.append(Photos(dictionary: $0))
+            })
         }
     }
 }

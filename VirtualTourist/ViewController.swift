@@ -63,7 +63,8 @@ class ViewController: UIViewController {
         
         let annotation = MKPointAnnotation()
         let pin = Pin(coordinate: touchMapCoordinate)
-        annotation.coordinate = pin.coordinate
+        let coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
+        annotation.coordinate = coordinate
         annotations.append(annotation)
         mapView.addAnnotation(annotation)
     }
@@ -97,6 +98,8 @@ extension ViewController: MKMapViewDelegate {
             mapView.removeAnnotation((view.annotation)!)
             return
         }
+        // Deselecting map annotation.
+        mapView.deselectAnnotation(view.annotation, animated: false)
         
         // If title is Edit
         let controller = storyboard?.instantiateViewControllerWithIdentifier("FlickrPhotoViewController") as! FlickrPhotoViewController
