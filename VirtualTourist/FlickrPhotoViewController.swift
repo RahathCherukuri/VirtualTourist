@@ -127,14 +127,15 @@ extension FlickrPhotoViewController: UICollectionViewDataSource {
             if let localImage = photo.image {
                 cell.imageView.image = localImage
             } else if photo.imagePath == nil || photo.imagePath == "" {
+                print("imagePath is nil")
             } else {
                 let imageUrlString = photo.imagePath
                 let imageURL = NSURL(string: imageUrlString!)
                 if let imageData = NSData(contentsOfURL: imageURL!) {
+                    let image = UIImage(data: imageData)
+                    photo.image = image
                     dispatch_async(dispatch_get_main_queue(), {
-                        let image = UIImage(data: imageData)
                         cell.imageView.image = image
-                        photo.image = image
                     })
                 }
             }

@@ -20,7 +20,7 @@ class Photos {
     
     var image: UIImage? {
         get { return FlickrClient.Caches.imageCache.imageWithIdentifier(imagePath) }
-        set { FlickrClient.Caches.imageCache.storeImage(image, withIdentifier: imagePath!) }
+        set { FlickrClient.Caches.imageCache.storeImage(newValue, withIdentifier: imagePath!) }
     }
     
 }
