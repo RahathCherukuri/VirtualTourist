@@ -26,6 +26,11 @@ class ViewController: UIViewController {
         deleteItemsButton.hidden = true
     }
     
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        
+    }
+    
     func addBarButtonItem() {
         let editButton = UIBarButtonItem.init(title: "Edit", style: .Plain, target:self, action: #selector(ViewController.editButtonPressed(_:)))
         navigationController?.navigationBar.topItem?.rightBarButtonItem = editButton
@@ -103,7 +108,8 @@ extension ViewController: MKMapViewDelegate {
         
         // If title is Edit
         let controller = storyboard?.instantiateViewControllerWithIdentifier("FlickrPhotoViewController") as! FlickrPhotoViewController
-        controller.coordinate = view.annotation?.coordinate
+//        controller.coordinate = view.annotation?.coordinate
+        controller.pin = Pin(coordinate: (view.annotation?.coordinate)!)
         navigationController?.pushViewController(controller, animated: true)
     }
     

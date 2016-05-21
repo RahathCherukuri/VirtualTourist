@@ -19,9 +19,7 @@ class FlickrPhotoViewController: UIViewController {
     
     var selectedIndexes = Set<NSIndexPath>();
     
-    var coordinate: CLLocationCoordinate2D?
-    
-    var photoArray: [Photos] = []
+    var pin: Pin!
     
     var methodArguments: [String: AnyObject] = [
         "method": METHOD_NAME,
@@ -36,13 +34,18 @@ class FlickrPhotoViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         flickrCollectionView.allowsMultipleSelection = true
-        setCollectionView()
+    }
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        if pin.photos.isEmpty {
+            setCollectionView()
+        }
     }
     
     func setCollectionView() {
-        
-        methodArguments["lat"] = coordinate?.latitude
-        methodArguments["lon"] = coordinate?.longitude
+        methodArguments["lat"] = pin.latitude
+        methodArguments["lon"] = pin.longitude
         methodArguments["page"] = 0
         getImagesFromFlickr()
     }
@@ -52,7 +55,7 @@ class FlickrPhotoViewController: UIViewController {
         if selectedIndexes.count > 0 {
             print("Delete items")
             _ = selectedIndexes.map({
-                photoArray.removeAtIndex($0.row)
+                pin.photos.removeAtIndex($0.row)
                 array.append($0)
             })
             flickrCollectionView.deleteItemsAtIndexPaths(array)
@@ -66,9 +69,10 @@ class FlickrPhotoViewController: UIViewController {
     func getImagesFromFlickr() {
         FlickrClient.sharedInstance().getImageFromFlickrBySearch(methodArguments) {(success, photos, errorString) in
             if success {
-                self.photoArray.removeAll()
+                self.pin.photos.removeAll()
                 self.savePhotoData(photos!)
                 dispatch_async(dispatch_get_main_queue(), {
+                    
                     self.flickrCollectionView.reloadData()
                 })
             } else {
@@ -102,7 +106,9 @@ class FlickrPhotoViewController: UIViewController {
             pages = totalPages
             
             _ = photosArray.map({
-                photoArray.append(Photos(dictionary: $0))
+                let photo = Photos(dictionary: $0)
+                pin.photos.append(photo)
+//                photoArray.append(photo)
             })
         }
     }
@@ -110,21 +116,27 @@ class FlickrPhotoViewController: UIViewController {
 
 extension FlickrPhotoViewController: UICollectionViewDataSource {
     func collectionView(collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return photoArray.count
+        return pin.photos.count
     }
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("FlickrCollectionViewCell", forIndexPath: indexPath) as! FlickrCollectionViewCell
         
-        if photoArray.count > 0 {
-            let photo = photoArray[indexPath.row]
-            
-            let imageUrlString = photo.url
-            let imageURL = NSURL(string: imageUrlString)
-            if let imageData = NSData(contentsOfURL: imageURL!) {
-                dispatch_async(dispatch_get_main_queue(), {
-                    cell.imageView.image = UIImage(data: imageData)
-                })
+        if pin.photos.count > 0 {
+            let photo = pin.photos[indexPath.row]
+            if let localImage = photo.image {
+                cell.imageView.image = localImage
+            } else if photo.imagePath == nil || photo.imagePath == "" {
+            } else {
+                let imageUrlString = photo.imagePath
+                let imageURL = NSURL(string: imageUrlString!)
+                if let imageData = NSData(contentsOfURL: imageURL!) {
+                    dispatch_async(dispatch_get_main_queue(), {
+                        let image = UIImage(data: imageData)
+                        cell.imageView.image = image
+                        photo.image = image
+                    })
+                }
             }
             setCellOpacity(cell)
             return cell

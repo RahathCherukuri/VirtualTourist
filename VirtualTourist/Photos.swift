@@ -6,15 +6,21 @@
 //  Copyright © 2016 Rahath cherukuri. All rights reserved.
 //
 
-import Foundation
+import UIKit
 
 class Photos {
     
     var title: String
-    var url: String
+    var imagePath: String?
     
     init(dictionary: [String : AnyObject]) {
         title = dictionary[FlickrClient.JSONResponseKeys.Title] as! String
-        url = dictionary[FlickrClient.JSONResponseKeys.Url] as! String
+        imagePath = dictionary[FlickrClient.JSONResponseKeys.Url] as? String
     }
+    
+    var image: UIImage? {
+        get { return FlickrClient.Caches.imageCache.imageWithIdentifier(imagePath) }
+        set { FlickrClient.Caches.imageCache.storeImage(image, withIdentifier: imagePath!) }
+    }
+    
 }

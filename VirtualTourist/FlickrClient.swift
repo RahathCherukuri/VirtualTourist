@@ -52,7 +52,6 @@ class FlickrClient: NSObject {
         return task
     }
     
-    
     // MARK: Helpers
     
     /* Helper: Given raw JSON, return a usable Foundation object */
@@ -99,6 +98,12 @@ class FlickrClient: NSObject {
         }
         
         return Singleton.sharedInstance
+    }
+    
+    // MARK: - Shared Image Cache
+    
+    struct Caches {
+        static let imageCache = ImageCache()
     }
 
 }
