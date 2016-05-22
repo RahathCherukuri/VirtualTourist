@@ -15,7 +15,7 @@ class ViewController: UIViewController {
     
     @IBOutlet weak var deleteItemsButton: UIButton!
     
-    var annotations: Array = [MKPointAnnotation]()
+    var pins = [Pin]()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -66,12 +66,15 @@ class ViewController: UIViewController {
         let touchPoint = gestureRecognizer.locationInView(self.mapView)
         let touchMapCoordinate = mapView.convertPoint(touchPoint, toCoordinateFromView: mapView)
         
-        let annotation = MKPointAnnotation()
         let pin = Pin(coordinate: touchMapCoordinate)
-        let coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
-        annotation.coordinate = coordinate
-        annotations.append(annotation)
-        mapView.addAnnotation(annotation)
+        pins.append(pin)
+        mapView.addAnnotation(convertPinToAnnotation(pin))
+    }
+    
+    func convertPinToAnnotation(pin: Pin) -> MKPointAnnotation {
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
+        return annotation
     }
 }
 
@@ -97,8 +100,9 @@ extension ViewController: MKMapViewDelegate {
     func mapView(mapView: MKMapView, didSelectAnnotationView view: MKAnnotationView) {
         let title = getRightBarButtonItemTitle()
         if (title == "Done") {
-            annotations = annotations.filter({
-                return compareAnnotations($0.coordinate, selectedAnnotation: (view.annotation?.coordinate)!)
+            pins = pins.filter({
+                let coordinate = CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+                return compareAnnotations(coordinate, selectedAnnotation: (view.annotation?.coordinate)!)
             })
             mapView.removeAnnotation((view.annotation)!)
             return
@@ -108,11 +112,18 @@ extension ViewController: MKMapViewDelegate {
         
         // If title is Edit
         let controller = storyboard?.instantiateViewControllerWithIdentifier("FlickrPhotoViewController") as! FlickrPhotoViewController
-//        controller.coordinate = view.annotation?.coordinate
-        controller.pin = Pin(coordinate: (view.annotation?.coordinate)!)
+        
+        _ = pins.map ({
+            let selectedAnnotion = view.annotation?.coordinate
+            let annotationInPins = CLLocationCoordinate2D(latitude: $0.latitude, longitude: $0.longitude)
+            if (!compareAnnotations(annotationInPins, selectedAnnotation: selectedAnnotion!)) {
+                controller.pin = $0
+            }
+        })
         navigationController?.pushViewController(controller, animated: true)
     }
     
+    // This function compares two annotations and returns the negative.
     func compareAnnotations(annotation: CLLocationCoordinate2D, selectedAnnotation: CLLocationCoordinate2D) -> Bool {
         return !((annotation.latitude == selectedAnnotation.latitude) && (annotation.longitude == selectedAnnotation.longitude))
     }
