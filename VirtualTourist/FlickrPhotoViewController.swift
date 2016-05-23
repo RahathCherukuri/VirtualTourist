@@ -8,6 +8,7 @@
 
 import UIKit
 import MapKit
+import CoreData
 
 class FlickrPhotoViewController: UIViewController {
     
@@ -30,7 +31,17 @@ class FlickrPhotoViewController: UIViewController {
         "nojsoncallback": NO_JSON_CALLBACK,
         "per_page": PER_PAGE
     ]
-
+    
+    // MARK: - Core Data Convenience
+    
+    lazy var sharedContext: NSManagedObjectContext =  {
+        return CoreDataStackManager.sharedInstance().managedObjectContext
+    }()
+    
+    func saveContext() {
+        CoreDataStackManager.sharedInstance().saveContext()
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         flickrCollectionView.allowsMultipleSelection = true
@@ -55,11 +66,19 @@ class FlickrPhotoViewController: UIViewController {
         if selectedIndexes.count > 0 {
             print("Delete items")
             _ = selectedIndexes.map({
-                pin.photos.removeAtIndex($0.row)
+                let selectedPhoto = pin.photos[$0.row]
+                selectedPhoto.location = nil
+                
+                // Remove the movie from the context
+                sharedContext.deleteObject(selectedPhoto)
+                saveContext()
+                
                 array.append($0)
             })
             flickrCollectionView.deleteItemsAtIndexPaths(array)
             selectedIndexes.removeAll()
+            
+            
         } else {
             methodArguments["page"] = randomValue(pages!)
             getImagesFromFlickr()
@@ -72,7 +91,6 @@ class FlickrPhotoViewController: UIViewController {
                 self.pin.photos.removeAll()
                 self.savePhotoData(photos!)
                 dispatch_async(dispatch_get_main_queue(), {
-                    
                     self.flickrCollectionView.reloadData()
                 })
             } else {
@@ -106,10 +124,10 @@ class FlickrPhotoViewController: UIViewController {
             pages = totalPages
             
             _ = photosArray.map({
-                let photo = Photos(dictionary: $0)
-                pin.photos.append(photo)
-//                photoArray.append(photo)
+                let photo = Photo(dictionary: $0, context: sharedContext)
+                photo.location = pin
             })
+            saveContext()
         }
     }
 }
