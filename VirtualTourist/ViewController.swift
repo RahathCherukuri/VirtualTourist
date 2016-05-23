@@ -40,6 +40,10 @@ class ViewController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         pins = fetchAllPins()
+        print("pins.count: ", pins.count)
+        _ = pins.map({
+            addAnnotation(convertPinToAnnotation($0))
+        })
         addLongPressGestureRecognizer()
         addBarButtonItem()
         mapView.delegate = self
@@ -48,7 +52,7 @@ class ViewController: UIViewController {
 
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-
+        
     }
 
     func addBarButtonItem() {
@@ -89,13 +93,17 @@ class ViewController: UIViewController {
         let pin = Pin(coordinate: touchMapCoordinate, context: sharedContext)
         saveContext()
         pins.append(pin)
-        mapView.addAnnotation(convertPinToAnnotation(pin))
+        addAnnotation(convertPinToAnnotation(pin))
     }
 
     func convertPinToAnnotation(pin: Pin) -> MKPointAnnotation {
         let annotation = MKPointAnnotation()
         annotation.coordinate = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
         return annotation
+    }
+    
+    func addAnnotation(annotation: MKPointAnnotation) {
+        mapView.addAnnotation(annotation)
     }
 
 }

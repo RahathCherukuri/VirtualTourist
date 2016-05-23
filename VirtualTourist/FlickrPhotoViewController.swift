@@ -50,19 +50,24 @@ class FlickrPhotoViewController: UIViewController {
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
         if pin.photos.isEmpty {
+            methodArguments["page"] = 0
             setCollectionView()
         }
     }
     
     func setCollectionView() {
+        setLatitudeLongitude()
+        getImagesFromFlickr()
+    }
+    
+    func setLatitudeLongitude() {
         methodArguments["lat"] = pin.latitude
         methodArguments["lon"] = pin.longitude
-        methodArguments["page"] = 0
-        getImagesFromFlickr()
     }
     
     @IBAction func bottomButtonPressed(sender: UIButton) {
         var array = [NSIndexPath]()
+        // To Delete items
         if selectedIndexes.count > 0 {
             print("Delete items")
             _ = selectedIndexes.map({
@@ -78,23 +83,13 @@ class FlickrPhotoViewController: UIViewController {
             flickrCollectionView.deleteItemsAtIndexPaths(array)
             selectedIndexes.removeAll()
             
-            
         } else {
-            methodArguments["page"] = randomValue(pages!)
-            getImagesFromFlickr()
-        }
-    }
-    
-    func getImagesFromFlickr() {
-        FlickrClient.sharedInstance().getImageFromFlickrBySearch(methodArguments) {(success, photos, errorString) in
-            if success {
-                self.pin.photos.removeAll()
-                self.savePhotoData(photos!)
-                dispatch_async(dispatch_get_main_queue(), {
-                    self.flickrCollectionView.reloadData()
-                })
-            } else {
-                print("Error: ", errorString)
+            // To get new collection photos
+            getNewImagesFromFlickr(){success, pages in
+                if success {
+                    self.methodArguments["page"] = self.randomValue(pages!)
+                    self.setCollectionView()
+                }
             }
         }
     }
@@ -105,6 +100,41 @@ class FlickrPhotoViewController: UIViewController {
     func randomValue(noOfPages: Int) -> Int {
         let pageLimit = min(noOfPages, 80)
         return Int(arc4random_uniform(UInt32(pageLimit))) + 1
+    }
+    
+    func getImagesFromFlickr() {
+        FlickrClient.sharedInstance().getImageFromFlickrBySearch(methodArguments) {(success, photos, errorString) in
+            if success {
+//                self.pin.photos.removeAll()
+                self.savePhotoData(photos!)
+                dispatch_async(dispatch_get_main_queue(), {
+                    self.flickrCollectionView.reloadData()
+                })
+                self.saveContext()
+            } else {
+                print("Error: ", errorString)
+            }
+        }
+    }
+    
+    func getNewImagesFromFlickr(completionHandler: (success: Bool , pages: Int?) -> Void) {
+        setLatitudeLongitude()
+        FlickrClient.sharedInstance().getImageFromFlickrBySearch(methodArguments) {(success, photos, errorString) in
+            if success {
+                let totalPhotosCount = (photos![FlickrClient.JSONResponseKeys.Totalphotos] as? NSString)?.integerValue
+                if (totalPhotosCount > 0) {
+                    guard let totalPages = photos![FlickrClient.JSONResponseKeys.Pages] as? Int else {
+                        print("Cannot find key")
+                        return
+                    }
+                    completionHandler(success: true, pages: totalPages)
+                }
+            } else {
+                print("Error: ", errorString)
+                completionHandler(success: false, pages: nil)
+            }
+        }
+
     }
     
     func savePhotoData(photos: [String: AnyObject]) {
@@ -125,9 +155,9 @@ class FlickrPhotoViewController: UIViewController {
             
             _ = photosArray.map({
                 let photo = Photo(dictionary: $0, context: sharedContext)
-                photo.location = pin
+                photo.location = self.pin
             })
-            saveContext()
+            
         }
     }
 }
@@ -143,10 +173,12 @@ extension FlickrPhotoViewController: UICollectionViewDataSource {
         if pin.photos.count > 0 {
             let photo = pin.photos[indexPath.row]
             if let localImage = photo.image {
+                print("image Present")
                 cell.imageView.image = localImage
             } else if photo.imagePath == nil || photo.imagePath == "" {
                 print("imagePath is nil")
             } else {
+                print("No Image")
                 let imageUrlString = photo.imagePath
                 let imageURL = NSURL(string: imageUrlString!)
                 if let imageData = NSData(contentsOfURL: imageURL!) {
