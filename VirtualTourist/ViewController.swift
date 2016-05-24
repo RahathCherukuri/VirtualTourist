@@ -38,12 +38,9 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        loadMapRegion(true)
         // Do any additional setup after loading the view, typically from a nib.
-        pins = fetchAllPins()
-        print("pins.count: ", pins.count)
-        _ = pins.map({
-            addAnnotation(convertPinToAnnotation($0))
-        })
+        
         addLongPressGestureRecognizer()
         addBarButtonItem()
         mapView.delegate = self
@@ -52,7 +49,6 @@ class ViewController: UIViewController {
 
     override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        
     }
 
     func addBarButtonItem() {
@@ -105,10 +101,51 @@ class ViewController: UIViewController {
     func addAnnotation(annotation: MKPointAnnotation) {
         mapView.addAnnotation(annotation)
     }
+    
+    // Helpers for initialmapload
+    
+    var filePath : String {
+        let manager = NSFileManager.defaultManager()
+        let url = manager.URLsForDirectory(.DocumentDirectory, inDomains: .UserDomainMask).first! as NSURL
+        return url.URLByAppendingPathComponent("mapRegionArchive").path!
+    }
+    
+    func saveMapRegion() {
+        
+        let dictionary = [
+            "latitude" : mapView.region.center.latitude,
+            "longitude" : mapView.region.center.longitude,
+            "latitudeDelta" : mapView.region.span.latitudeDelta,
+            "longitudeDelta" : mapView.region.span.longitudeDelta
+        ]
+        
+        NSKeyedArchiver.archiveRootObject(dictionary, toFile: filePath)
+    }
+    
+    func loadMapRegion(animated: Bool) {
+        
+        if let regionDictionary = NSKeyedUnarchiver.unarchiveObjectWithFile(filePath) as? [String : AnyObject] {
+            
+            let longitude = regionDictionary["longitude"] as! CLLocationDegrees
+            let latitude = regionDictionary["latitude"] as! CLLocationDegrees
+            let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            
+            let longitudeDelta = regionDictionary["latitudeDelta"] as! CLLocationDegrees
+            let latitudeDelta = regionDictionary["longitudeDelta"] as! CLLocationDegrees
+            let span = MKCoordinateSpan(latitudeDelta: latitudeDelta, longitudeDelta: longitudeDelta)
+            
+            let savedRegion = MKCoordinateRegion(center: center, span: span)
+            mapView.setRegion(savedRegion, animated: animated)
+        }
+    }
 
 }
 
 extension ViewController: MKMapViewDelegate {
+    
+    func mapView(mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
+        saveMapRegion()
+    }
 
     // Returns the view associated with the specified annotation object.
     func mapView(mapView: MKMapView, viewForAnnotation annotation: MKAnnotation) -> MKAnnotationView? {
@@ -158,6 +195,14 @@ extension ViewController: MKMapViewDelegate {
         })
 
         navigationController?.pushViewController(controller, animated: true)
+    }
+    
+    func mapViewDidFinishRenderingMap(mapView: MKMapView, fullyRendered: Bool) {
+        view.alpha = 1.0
+        pins = fetchAllPins()
+        _ = pins.map({
+            addAnnotation(convertPinToAnnotation($0))
+        })
     }
 
     // This function compares two annotations and returns the negative.
