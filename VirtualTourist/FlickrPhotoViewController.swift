@@ -16,6 +16,8 @@ class FlickrPhotoViewController: UIViewController {
     
     @IBOutlet weak var bottomBarButton: UIButton!
     
+    @IBOutlet weak var mapView: MKMapView!
+    
     var pages: Int?
     
     var selectedIndexes = Set<NSIndexPath>();
@@ -44,6 +46,7 @@ class FlickrPhotoViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        loadMapView()
         flickrCollectionView.allowsMultipleSelection = true
     }
     
@@ -53,6 +56,17 @@ class FlickrPhotoViewController: UIViewController {
             methodArguments["page"] = 0
             setCollectionView()
         }
+    }
+    
+    func loadMapView(){
+        let center = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
+        let span = MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5)
+        let savedRegion = MKCoordinateRegion(center: center, span: span)
+        mapView.setRegion(savedRegion, animated: true)
+        
+        let annotation = MKPointAnnotation()
+        annotation.coordinate = center
+        mapView.addAnnotation(annotation)
     }
     
     func setCollectionView() {
@@ -74,7 +88,7 @@ class FlickrPhotoViewController: UIViewController {
                 let selectedPhoto = pin.photos[$0.row]
                 selectedPhoto.location = nil
                 
-                // Remove the movie from the context
+                // Remove the photo from the context
                 sharedContext.deleteObject(selectedPhoto)
                 saveContext()
                 
@@ -82,8 +96,16 @@ class FlickrPhotoViewController: UIViewController {
             })
             flickrCollectionView.deleteItemsAtIndexPaths(array)
             selectedIndexes.removeAll()
+            setbottomBarButtonText()
             
         } else {
+            _ = pin.photos.map({
+                $0.location = nil
+                // Remove the photo from the context
+                sharedContext.deleteObject($0)
+                saveContext()
+            })
+            flickrCollectionView.reloadData()
             // To get new collection photos
             getNewImagesFromFlickr(){success, pages in
                 if success {
@@ -169,31 +191,48 @@ extension FlickrPhotoViewController: UICollectionViewDataSource {
     
     func collectionView(collectionView: UICollectionView, cellForItemAtIndexPath indexPath: NSIndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCellWithReuseIdentifier("FlickrCollectionViewCell", forIndexPath: indexPath) as! FlickrCollectionViewCell
-        
         if pin.photos.count > 0 {
-            let photo = pin.photos[indexPath.row]
-            if let localImage = photo.image {
-                print("image Present")
-                cell.imageView.image = localImage
-            } else if photo.imagePath == nil || photo.imagePath == "" {
-                print("imagePath is nil")
-            } else {
-                print("No Image")
-                let imageUrlString = photo.imagePath
-                let imageURL = NSURL(string: imageUrlString!)
-                if let imageData = NSData(contentsOfURL: imageURL!) {
-                    let image = UIImage(data: imageData)
-                    photo.image = image
-                    dispatch_async(dispatch_get_main_queue(), {
-                        cell.imageView.image = image
-                    })
-                }
-            }
-            setCellOpacity(cell)
+            configureCell(cell, forIndexPath: indexPath)
             return cell
         } else {
             return cell
         }
+    }
+    
+    func configureCell(cell: FlickrCollectionViewCell, forIndexPath indexPath: NSIndexPath) {
+        cell.spinner.startAnimating()
+        let photo = pin.photos[indexPath.row]
+        if let localImage = photo.image {
+            print("image Present")
+            stopAndHideSpinner(cell)
+            cell.imageView.image = localImage
+        } else if photo.imagePath == nil || photo.imagePath == "" {
+            print("imagePath is nil")
+            stopAndHideSpinner(cell)
+        } else {
+            print("No Image")
+            let imageUrlString = photo.imagePath
+            let imageURL = NSURL(string: imageUrlString!)
+            FlickrClient.sharedInstance().taskForImage(imageURL!) {(data, error) in
+                if error != nil {
+                    print("Downloading error");
+                } else {
+                    let image = UIImage(data: data!)
+                    photo.image = image
+                    dispatch_async(dispatch_get_main_queue(), {
+                        self.stopAndHideSpinner(cell)
+                        cell.imageView.image = image
+                        
+                    })
+                }
+            }
+        }
+        setCellOpacity(cell)
+    }
+    
+    func stopAndHideSpinner(cell: FlickrCollectionViewCell) {
+        cell.spinner.stopAnimating()
+        cell.spinner.hidden = true
     }
 
 }
