@@ -60,7 +60,7 @@ class FlickrPhotoViewController: UIViewController {
     
     func loadMapView(){
         let center = CLLocationCoordinate2D(latitude: pin.latitude, longitude: pin.longitude)
-        let span = MKCoordinateSpan(latitudeDelta: 0.5, longitudeDelta: 0.5)
+        let span = MKCoordinateSpan(latitudeDelta: 0.75, longitudeDelta: 0.75)
         let savedRegion = MKCoordinateRegion(center: center, span: span)
         mapView.setRegion(savedRegion, animated: true)
         
