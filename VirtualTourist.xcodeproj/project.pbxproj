@@ -17,10 +17,12 @@
 		326733CF1CCEF9B800541D83 /* FlickrPhotoViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 326733CE1CCEF9B800541D83 /* FlickrPhotoViewController.swift */; };
 		326733D11CCEFB9C00541D83 /* FlickrClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 326733D01CCEFB9C00541D83 /* FlickrClient.swift */; };
 		326733D31CCEFBC900541D83 /* FlickrConstants.swift in Sources */ = {isa = PBXBuildFile; fileRef = 326733D21CCEFBC900541D83 /* FlickrConstants.swift */; };
-		326733D51CCEFCD400541D83 /* Photos.swift in Sources */ = {isa = PBXBuildFile; fileRef = 326733D41CCEFCD400541D83 /* Photos.swift */; };
+		326733D51CCEFCD400541D83 /* Photo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 326733D41CCEFCD400541D83 /* Photo.swift */; };
 		326733D71CCEFD3000541D83 /* FlickrConvenience.swift in Sources */ = {isa = PBXBuildFile; fileRef = 326733D61CCEFD3000541D83 /* FlickrConvenience.swift */; };
 		326733D91CCEFE7200541D83 /* FlickrCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 326733D81CCEFE7200541D83 /* FlickrCollectionViewCell.swift */; };
 		3295AF041CF0E615006BB726 /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3295AF031CF0E615006BB726 /* ImageCache.swift */; };
+		3295AF071CF11D32006BB726 /* CoreDataStackManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3295AF061CF11D32006BB726 /* CoreDataStackManager.swift */; };
+		3295AF0A1CF11E7F006BB726 /* Model.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 3295AF081CF11E7F006BB726 /* Model.xcdatamodeld */; };
 		32FC57821CECB6AA00007865 /* Pin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32FC57811CECB6AA00007865 /* Pin.swift */; };
 /* End PBXBuildFile section */
 
@@ -58,10 +60,12 @@
 		326733CE1CCEF9B800541D83 /* FlickrPhotoViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlickrPhotoViewController.swift; sourceTree = "<group>"; };
 		326733D01CCEFB9C00541D83 /* FlickrClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlickrClient.swift; sourceTree = "<group>"; };
 		326733D21CCEFBC900541D83 /* FlickrConstants.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlickrConstants.swift; sourceTree = "<group>"; };
-		326733D41CCEFCD400541D83 /* Photos.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Photos.swift; sourceTree = "<group>"; };
+		326733D41CCEFCD400541D83 /* Photo.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Photo.swift; sourceTree = "<group>"; };
 		326733D61CCEFD3000541D83 /* FlickrConvenience.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlickrConvenience.swift; sourceTree = "<group>"; };
 		326733D81CCEFE7200541D83 /* FlickrCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlickrCollectionViewCell.swift; sourceTree = "<group>"; };
 		3295AF031CF0E615006BB726 /* ImageCache.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
+		3295AF061CF11D32006BB726 /* CoreDataStackManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CoreDataStackManager.swift; sourceTree = "<group>"; };
+		3295AF091CF11E7F006BB726 /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
 		32FC57811CECB6AA00007865 /* Pin.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pin.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -114,12 +118,13 @@
 			isa = PBXGroup;
 			children = (
 				326733A01CCEE98000541D83 /* AppDelegate.swift */,
-				326733A21CCEE98000541D83 /* ViewController.swift */,
-				326733CE1CCEF9B800541D83 /* FlickrPhotoViewController.swift */,
+				3295AF061CF11D32006BB726 /* CoreDataStackManager.swift */,
+				3295AF081CF11E7F006BB726 /* Model.xcdatamodeld */,
+				3295AF051CF1106A006BB726 /* Controllers */,
 				3280FF161CD10F0800F1C431 /* API */,
 				326733D81CCEFE7200541D83 /* FlickrCollectionViewCell.swift */,
 				326733A41CCEE98000541D83 /* Main.storyboard */,
-				326733D41CCEFCD400541D83 /* Photos.swift */,
+				326733D41CCEFCD400541D83 /* Photo.swift */,
 				32FC57811CECB6AA00007865 /* Pin.swift */,
 				326733A71CCEE98000541D83 /* Assets.xcassets */,
 				326733A91CCEE98000541D83 /* LaunchScreen.storyboard */,
@@ -155,6 +160,15 @@
 				326733D21CCEFBC900541D83 /* FlickrConstants.swift */,
 			);
 			name = API;
+			sourceTree = "<group>";
+		};
+		3295AF051CF1106A006BB726 /* Controllers */ = {
+			isa = PBXGroup;
+			children = (
+				326733A21CCEE98000541D83 /* ViewController.swift */,
+				326733CE1CCEF9B800541D83 /* FlickrPhotoViewController.swift */,
+			);
+			name = Controllers;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -291,7 +305,8 @@
 			files = (
 				3295AF041CF0E615006BB726 /* ImageCache.swift in Sources */,
 				326733D71CCEFD3000541D83 /* FlickrConvenience.swift in Sources */,
-				326733D51CCEFCD400541D83 /* Photos.swift in Sources */,
+				3295AF071CF11D32006BB726 /* CoreDataStackManager.swift in Sources */,
+				326733D51CCEFCD400541D83 /* Photo.swift in Sources */,
 				326733A31CCEE98000541D83 /* ViewController.swift in Sources */,
 				32FC57821CECB6AA00007865 /* Pin.swift in Sources */,
 				326733D91CCEFE7200541D83 /* FlickrCollectionViewCell.swift in Sources */,
@@ -299,6 +314,7 @@
 				326733CF1CCEF9B800541D83 /* FlickrPhotoViewController.swift in Sources */,
 				326733A11CCEE98000541D83 /* AppDelegate.swift in Sources */,
 				326733D11CCEFB9C00541D83 /* FlickrClient.swift in Sources */,
+				3295AF0A1CF11E7F006BB726 /* Model.xcdatamodeld in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -552,6 +568,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		3295AF081CF11E7F006BB726 /* Model.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				3295AF091CF11E7F006BB726 /* Model.xcdatamodel */,
+			);
+			currentVersion = 3295AF091CF11E7F006BB726 /* Model.xcdatamodel */;
+			path = Model.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 326733951CCEE98000541D83 /* Project object */;
 }
