@@ -38,12 +38,11 @@ class ViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        loadMapRegion(true)
+        mapView.delegate = self
         // Do any additional setup after loading the view, typically from a nib.
-        
+        loadMapRegion(true)
         addLongPressGestureRecognizer()
         addBarButtonItem()
-        mapView.delegate = self
         deleteItemsButton.hidden = true
     }
 
@@ -118,6 +117,7 @@ class ViewController: UIViewController {
             "latitudeDelta" : mapView.region.span.latitudeDelta,
             "longitudeDelta" : mapView.region.span.longitudeDelta
         ]
+        print("saveMapRegion: ", dictionary["latitude"],dictionary["longitude"],dictionary["latitudeDelta"], dictionary["longitudeDelta"])
         
         NSKeyedArchiver.archiveRootObject(dictionary, toFile: filePath)
     }
@@ -126,17 +126,32 @@ class ViewController: UIViewController {
         
         if let regionDictionary = NSKeyedUnarchiver.unarchiveObjectWithFile(filePath) as? [String : AnyObject] {
             
-            let longitude = regionDictionary["longitude"] as! CLLocationDegrees
             let latitude = regionDictionary["latitude"] as! CLLocationDegrees
-            let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+            let longitude = regionDictionary["longitude"] as! CLLocationDegrees
             
-            let longitudeDelta = regionDictionary["latitudeDelta"] as! CLLocationDegrees
-            let latitudeDelta = regionDictionary["longitudeDelta"] as! CLLocationDegrees
+            let latitudeDelta = regionDictionary["latitudeDelta"] as! CLLocationDegrees
+            let longitudeDelta = regionDictionary["longitudeDelta"] as! CLLocationDegrees
+            
+            let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
             let span = MKCoordinateSpan(latitudeDelta: latitudeDelta, longitudeDelta: longitudeDelta)
+            print("loadMapRegion: ", center.latitude,center.longitude,span.latitudeDelta, span.longitudeDelta)
             
             let savedRegion = MKCoordinateRegion(center: center, span: span)
             mapView.setRegion(savedRegion, animated: animated)
         }
+    }
+    
+    func mapViewRegionDidChangeFromUserInteraction() -> Bool {
+        let view = self.mapView.subviews[0]
+        //  Look through gesture recognizers to determine whether this region change is from user interaction
+        if let gestureRecognizers = view.gestureRecognizers {
+            for recognizer in gestureRecognizers {
+                if (recognizer.state == UIGestureRecognizerState.Began || recognizer.state == UIGestureRecognizerState.Ended) {
+                    return true
+                }
+            }
+        }
+        return false
     }
 
 }
@@ -144,7 +159,10 @@ class ViewController: UIViewController {
 extension ViewController: MKMapViewDelegate {
     
     func mapView(mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
-        saveMapRegion()
+        if mapViewRegionDidChangeFromUserInteraction() {
+            saveMapRegion()
+        }
+        
     }
 
     // Returns the view associated with the specified annotation object.
@@ -198,7 +216,6 @@ extension ViewController: MKMapViewDelegate {
     }
     
     func mapViewDidFinishRenderingMap(mapView: MKMapView, fullyRendered: Bool) {
-        view.alpha = 1.0
         pins = fetchAllPins()
         _ = pins.map({
             addAnnotation(convertPinToAnnotation($0))
