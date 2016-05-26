@@ -53,7 +53,7 @@ class FlickrPhotoViewController: UIViewController {
         
         let fetchRequest = NSFetchRequest(entityName: "Photo")
         
-        fetchRequest.sortDescriptors = []
+        fetchRequest.sortDescriptors = [NSSortDescriptor(key:"id", ascending: true)]
         fetchRequest.predicate = NSPredicate(format: "location == %@", self.pin);
         
         let fetchedResultsController = NSFetchedResultsController(fetchRequest: fetchRequest,
@@ -127,8 +127,8 @@ class FlickrPhotoViewController: UIViewController {
                 $0.location = nil
                 // Remove the photo from the context
                 sharedContext.deleteObject($0)
-                saveContext()
             })
+            saveContext()
             // To get new collection photos
             getNewImagesFromFlickr(){success, pages in
                 if success {
@@ -143,7 +143,7 @@ class FlickrPhotoViewController: UIViewController {
     /* Pick a random page! */
     
     func randomValue(noOfPages: Int) -> Int {
-        let pageLimit = min(noOfPages, 80)
+        let pageLimit = min(noOfPages, 40)
         return Int(arc4random_uniform(UInt32(pageLimit))) + 1
     }
     
@@ -220,6 +220,7 @@ extension FlickrPhotoViewController: UICollectionViewDataSource {
     }
     
     func configureCell(cell: FlickrCollectionViewCell, forIndexPath indexPath: NSIndexPath) {
+        cell.spinner.hidden = false
         cell.spinner.startAnimating()
         let photo = self.fetchedResultsController.objectAtIndexPath(indexPath) as! Photo
         
@@ -227,9 +228,11 @@ extension FlickrPhotoViewController: UICollectionViewDataSource {
             stopAndHideSpinner(cell)
             cell.imageView.image = localImage
         } else if photo.imagePath == nil || photo.imagePath == "" {
+            cell.imageView.image = UIImage(named: "noImage")
             stopAndHideSpinner(cell)
         } else {
             let imageUrlString = photo.imagePath
+            cell.imageView.image = UIImage(named: "placeholder")
             let imageURL = NSURL(string: imageUrlString!)
             FlickrClient.sharedInstance().taskForImage(imageURL!) {(data, error) in
                 if error != nil {
@@ -240,7 +243,6 @@ extension FlickrPhotoViewController: UICollectionViewDataSource {
                     dispatch_async(dispatch_get_main_queue(), {
                         self.stopAndHideSpinner(cell)
                         cell.imageView.image = image
-                        
                     })
                 }
             }

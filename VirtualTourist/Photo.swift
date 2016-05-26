@@ -31,6 +31,10 @@ class Photo: NSManagedObject {
         imagePath = dictionary[FlickrClient.JSONResponseKeys.Url] as? String
     }
     
+    override func prepareForDeletion() {
+        image = nil
+    }
+    
     var image: UIImage? {
         get { return FlickrClient.Caches.imageCache.imageWithIdentifier(id) }
         set { FlickrClient.Caches.imageCache.storeImage(newValue, withIdentifier: id) }
