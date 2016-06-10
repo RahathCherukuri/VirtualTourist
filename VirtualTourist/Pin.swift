@@ -22,11 +22,11 @@ class Pin: NSManagedObject {
     }
     
     
-    init(coordinate: CLLocationCoordinate2D, context: NSManagedObjectContext) {
+    init(latitude: Double, longitude: Double, context: NSManagedObjectContext) {
         let entity =  NSEntityDescription.entityForName("Pin", inManagedObjectContext: context)!
         super.init(entity: entity,insertIntoManagedObjectContext: context)
         
-        latitude = coordinate.latitude
-        longitude = coordinate.longitude
+        self.latitude = latitude
+        self.longitude = longitude
     }
 }

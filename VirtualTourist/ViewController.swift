@@ -84,8 +84,8 @@ class ViewController: UIViewController {
 
         let touchPoint = gestureRecognizer.locationInView(self.mapView)
         let touchMapCoordinate = mapView.convertPoint(touchPoint, toCoordinateFromView: mapView)
-
-        let pin = Pin(coordinate: touchMapCoordinate, context: sharedContext)
+                
+        let pin = Pin(latitude: touchMapCoordinate.latitude,longitude: touchMapCoordinate.longitude, context: sharedContext)
         saveContext()
         pins.append(pin)
         addAnnotation(convertPinToAnnotation(pin))

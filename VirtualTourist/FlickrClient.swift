@@ -8,16 +8,16 @@
 
 import Foundation
 
-class FlickrClient: NSObject {
-    // MARK: GET
+class FlickrClient {
+    
     
     var session: NSURLSession
     
-    override init() {
+    private init() {
         session = NSURLSession.sharedSession()
-        super.init()
     }
     
+    // MARK: GET
     func taskForGETMethod(method: String, parameters: [String : AnyObject], completionHandler: (result: AnyObject!, error: NSError?) -> Void) -> NSURLSessionDataTask {
         
         /* 1. Set the parameters */
@@ -112,14 +112,7 @@ class FlickrClient: NSObject {
     
     // MARK: Shared Instance
     
-    class func sharedInstance() -> FlickrClient {
-        
-        struct Singleton {
-            static var sharedInstance = FlickrClient()
-        }
-        
-        return Singleton.sharedInstance
-    }
+    static let sharedInstance = FlickrClient()
     
     // MARK: - Shared Image Cache
     

@@ -148,7 +148,7 @@ class FlickrPhotoViewController: UIViewController {
     }
     
     func getImagesFromFlickr() {
-        FlickrClient.sharedInstance().getImageFromFlickrBySearch(methodArguments) {(success, photos, errorString) in
+        FlickrClient.sharedInstance.getImageFromFlickrBySearch(methodArguments) {(success, photos, errorString) in
             if success {
                 self.savePhotoData(photos!)
                 self.saveContext()
@@ -160,7 +160,7 @@ class FlickrPhotoViewController: UIViewController {
     
     func getNewImagesFromFlickr(completionHandler: (success: Bool , pages: Int?) -> Void) {
         setLatitudeLongitude()
-        FlickrClient.sharedInstance().getImageFromFlickrBySearch(methodArguments) {(success, photos, errorString) in
+        FlickrClient.sharedInstance.getImageFromFlickrBySearch(methodArguments) {(success, photos, errorString) in
             if success {
                 let totalPhotosCount = (photos![FlickrClient.JSONResponseKeys.Totalphotos] as? NSString)?.integerValue
                 if (totalPhotosCount > 0) {
@@ -234,7 +234,7 @@ extension FlickrPhotoViewController: UICollectionViewDataSource {
             let imageUrlString = photo.imagePath
             cell.imageView.image = UIImage(named: "placeholder")
             let imageURL = NSURL(string: imageUrlString!)
-            FlickrClient.sharedInstance().taskForImage(imageURL!) {(data, error) in
+            FlickrClient.sharedInstance.taskForImage(imageURL!) {(data, error) in
                 if error != nil {
                     print("Downloading error");
                 } else {
